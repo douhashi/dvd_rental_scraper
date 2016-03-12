@@ -1,16 +1,9 @@
-package main
+package dvd_rental_scraper
 
 import (
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"net/url"
 	"sync"
 )
-
-type ResultItem struct {
-	Title      string
-	ReleasedAt string
-}
 
 func GetDVDItem(itemUrl string) ResultItem {
 	doc, _ := goquery.NewDocument(itemUrl)
@@ -56,39 +49,4 @@ func GetDVDItemUrls(url string) []string {
 		urls = append(urls, url)
 	})
 	return urls
-}
-
-func GetDVDPages(url string) []string {
-	urls := []string{url}
-	doc, _ := goquery.NewDocument(url)
-	doc.Find("ul.pageList").First().Find("li").Each(func(_ int, li *goquery.Selection) {
-		a := li.Find("a").First()
-		aClass, _ := a.Attr("class")
-		liClass, _ := li.Attr("class")
-
-		if liClass != "last" && aClass != "active" {
-			href, _ := a.Attr("href")
-			fullUrl := GenerateUrlWithPath(url, href)
-			urls = append(urls, fullUrl)
-		}
-	})
-	return urls
-}
-
-func GenerateUrlWithPath(pageUrl string, path string) string {
-	u, _ := url.Parse(pageUrl)
-	fullUrl := u.Scheme + "://" + u.Host + path
-	return fullUrl
-}
-
-func main() {
-	url := "http://store-tsutaya.tsite.jp/top/rels/dvd_rental.html"
-	pages := GetDVDPages(url)
-
-	itemUrls := GoGetDVDItemUrls(pages)
-	results := GoGetDVDItems(itemUrls)
-
-	for _, result := range results {
-		fmt.Println(result.Title + " : " + result.ReleasedAt)
-	}
 }
