@@ -33,6 +33,19 @@ func GoGetDVDItems(urls []string) []ResultItem {
 	wg.Wait()
 	return results
 }
+func GoGetDVDItemUrls(pages []string) []string {
+	itemUrls := []string{}
+	var wg sync.WaitGroup
+	for _, page := range pages {
+		wg.Add(1)
+		go func(page string) {
+			defer wg.Done()
+			itemUrls = append(itemUrls, GetDVDItemUrls(page)...)
+		}(page)
+	}
+	wg.Wait()
+	return itemUrls
+}
 
 // Get dvd item url list
 func GetDVDItemUrls(url string) []string {
@@ -72,10 +85,7 @@ func main() {
 	url := "http://store-tsutaya.tsite.jp/top/rels/dvd_rental.html"
 	pages := GetDVDPages(url)
 
-	itemUrls := []string{}
-	for _, page := range pages {
-		itemUrls = append(itemUrls, GetDVDItemUrls(page)...)
-	}
+	itemUrls := GoGetDVDItemUrls(pages)
 	results := GoGetDVDItems(itemUrls)
 
 	for _, result := range results {
