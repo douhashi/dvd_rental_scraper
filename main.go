@@ -1,16 +1,16 @@
 package main
 
 import (
-	"./dvd_rental_scraper"
+	"./tsutaya"
 	"fmt"
 )
 
 func main() {
 	url := "http://store-tsutaya.tsite.jp/top/rels/dvd_rental.html"
-	pages := dvd_rental_scraper.GetDVDPages(url)
+	pages := tsutaya.GetDVDPages(url)
 
-	itemUrls := dvd_rental_scraper.GoGetDVDItemUrls(pages)
-	results := dvd_rental_scraper.GoGetDVDItems(itemUrls)
+	itemUrls := tsutaya.GoGetDVDItemUrls(pages)
+	results := tsutaya.GoGetDVDItems(itemUrls)
 
 	for _, result := range results {
 		fmt.Println(result.Title + " : " + result.ReleasedAt)
